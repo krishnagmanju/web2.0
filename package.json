@@ -57,7 +57,6 @@
     "minimatch": "^3.1.2",
     "ms": "^2.0.0",
     "negotiator": "^0.6.3",
-    "nodemon": "^2.0.19",
     "nopt": "^1.0.10",
     "normalize-path": "^3.0.0",
     "object-inspect": "^1.12.2",
@@ -92,7 +91,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -103,5 +102,8 @@
   "bugs": {
     "url": "https://github.com/krishnagmanju/web2.0/issues"
   },
-  "homepage": "https://github.com/krishnagmanju/web2.0#readme"
+  "homepage": "https://github.com/krishnagmanju/web2.0#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
 }
