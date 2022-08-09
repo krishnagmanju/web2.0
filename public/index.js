@@ -10,7 +10,7 @@ class App extends React.Component{
 
   async componentDidMount(){
     const result = await axios.get('/get_total_amount');
-    
+
     this.setState({total_amount:result.data["0"].total_amount});
   }
 
@@ -20,7 +20,7 @@ class App extends React.Component{
       amount : this.state.amount,
       email : this.state.email
     })
-    console.log(response);
+    window.location.href=response.data;
   }
   render(){
     return(
