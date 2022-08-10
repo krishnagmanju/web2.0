@@ -1,14 +1,14 @@
 const express= require("express");
 const app= express();
 const bodyParser=require("body-parser");
-const {save_user_information} = require('./models/server_db');
+const {save_user_information,get_list_of_participants,delete_users} = require('./models/server_db');
 const path=require('path');
 const publicPath = path.join(__dirname,'./public');
 const paypal=require('paypal-rest-sdk');
 const session=require('express-session');
 
-app.use(session(
-  {secret:'my web app',
+app.use(session({
+  secret:'my web app',
   cookie :{maxAge:60000}
 }
 ));
@@ -88,7 +88,7 @@ paypal.payment.create(create_payment_json, function (error, payment) {
 
 });
 
-app.get('/success',(req,res)=>{
+app.get('/success', async (req,res)=>{
    const payerId = req.query.PayerID;
    const paymentId = req.query.paymentId;
    var execute_payment_json ={
@@ -109,6 +109,12 @@ app.get('/success',(req,res)=>{
         console.log(payment);
      }
    });
+   /*delete all mysql users*/
+   if(req.session.winner_picked){
+     var deleted=await delete_users();
+   }
+   req.session_winner_picked=false;
+
    res.redirect('http://localhost:3000');
 });
 
@@ -123,6 +129,22 @@ app.get('/pick_winner', async(req,res)=>{
   req.session.paypal_amount =total_amount;
 
 /*create paypal payment*/
+
+ var list_of_participants= await get_list_of_participants();
+ list_of_participants=JSON.parse(JSON.stringify(list_of_participants));
+ var email_array=[];
+
+ list_of_participants.forEach(function(element){
+   email_array.push(element.email);
+
+ });
+
+ var winner_email=email_array[Math.floor(Math.random()* email_array.length)];
+ req.session.winner_picked = true;
+
+
+
+
   var create_payment_json = {
    "intent": "sale",
    "payer": {
@@ -153,19 +175,7 @@ app.get('/pick_winner', async(req,res)=>{
    }]
   };
 
-  paypal.payment.create(create_payment_json, function (error, payment) {
-     if (error) {
-         throw error;
-     } else {
-         console.log("Create Payment Response");
-         console.log(payment);
-         for (var i=0; i< payment.links.length;i++){
-           if(payment.links[i].rel == 'approval_url'){
-             return res.send(payment.links[i].href);
-           }
-         }
-     }
-  });
+
 
 
 
